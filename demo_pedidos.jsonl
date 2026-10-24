@@ -1,0 +1,1 @@
+{"id": "PED-001", "cliente": "123", "estado": "CONFIRMADO", "total_pagado": 296000.0, "transaccion_id": "PF-00001", "ciudad": "Manizales", "items": [{"codigo": "P001", "cantidad": 2, "precio": 120000}, {"codigo": "P002", "cantidad": 1, "precio": 80000}]}

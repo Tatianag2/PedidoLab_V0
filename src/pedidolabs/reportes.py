@@ -1,43 +1,42 @@
 from datetime import date
 
-def generar_reporte_ventas(pedidos, fecha_inicio, fecha_fin, incluir_detalle=False):
-
-    if isinstance(fecha_inicio, date):
-        fi = fecha_inicio
+def _validar_fecha(fecha):
+    if isinstance(fecha, date):
+        return fecha
     else:
-        fi = date.fromisoformat(fecha_inicio)
+        return date.fromisoformat(fecha)
 
-    if isinstance(fecha_fin, date):
-        ff = fecha_fin
-    else:
-        ff = date.fromisoformat(fecha_fin)
+def _filtrar_pedidos_confirmados(pedidos, fecha_inicio, fecha_fin):
+    return [p for p in pedidos if p.estado == "CONFIRMADO" and fecha_inicio <= p.fecha.date() <= fecha_fin]
 
-    datos = []
-    for p in pedidos:
-        f = p.fecha.date()
-        if f >= fi and f <= ff and p.estado == "CONFIRMADO":
-            datos.append(p)
-
+def _generar_estadisticas(pedidos):
     total = 0
     cantidad = 0
     premium = 0
     corporativo = 0
     normal = 0
 
-    for p in datos:
-        total = total + p.total_pagado
-        cantidad = cantidad + 1
+    for p in pedidos:
+        total += p.total_pagado
+        cantidad += 1
         if p.cliente.tipo == "PREMIUM":
-            premium = premium + 1
+            premium += 1
         elif p.cliente.tipo == "CORPORATIVO":
-            corporativo = corporativo + 1
+            corporativo += 1
         else:
-            normal = normal + 1
+            normal += 1
 
-    if cantidad > 0:
-        promedio = total / cantidad
-    else:
-        promedio = 0
+    promedio = total / cantidad if cantidad > 0 else 0
+
+    return total, cantidad, promedio, normal, premium, corporativo
+
+def generar_reporte_ventas(pedidos, fecha_inicio, fecha_fin, incluir_detalle=False):
+
+    fi = _validar_fecha(fecha_inicio)
+    ff = _validar_fecha(fecha_fin)
+    datos = _filtrar_pedidos_confirmados(pedidos, fi, ff)
+
+    total, cantidad, promedio, normal, premium, corporativo = _generar_estadisticas(datos)
 
     salida = ""
     salida = salida + "REPORTE DE VENTAS\n"
